@@ -45,7 +45,7 @@ if (isset($_SESSION['unique_id'])) {
                 mysqli_query($conn, "INSERT INTO group_members (group_id, unique_id) VALUES ($group_id, '$member_id')");
             }
 
-            header("Location: ../public/group-chat.php?group_id=$group_id");
+            header("Location: ../public/users.php");
             exit();
         } else {
             echo "Failed to create group: " . mysqli_error($conn);
