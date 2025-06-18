@@ -82,7 +82,7 @@
         }
 
         .details span {
-                        color:rgb(0, 107, 124);
+                       color:black;
 
             font-weight: bold;
             font-size: 16px;
@@ -90,7 +90,7 @@
         }
 
         .details p {
-            color:rgb(0, 107, 124);
+            color: black;
             font-size: 12px;
             padding:3px;
         }
@@ -174,13 +174,14 @@
         }
 
         .users-list  div{
-            color:rgb(4, 56, 50) !important;
+            color:black !important;
             text-decoration: none;
             marign: 10px 10px;
         }
         .group-item a, .users-list a {
             text-decoration: none !important;
-            color: #00695c;
+            color:black !important;
+            fotnt-weight: bold;
             font-size: 16px;
             display: flex;
             justify-content: space-between;
@@ -192,16 +193,18 @@
             width: 35px;
             height: 35px;
             border-radius: 50%;
-            margin-right: 20px;
+            margin-left: 20px;
+            
         }
 
         .users-list .status-dot {
             margin-left: auto;
             font-size: 12px;
+            color:green;
         }
 
         .users-list .status-dot.offline {
-            color: #ccc;
+            color: green;
         }
 
         .chat-area .chat-header {
@@ -327,9 +330,9 @@
 
         .chat {
             padding: 7px;
-            background: #00897b;
+            background:rgba(0, 137, 123, 0.47);
             border-radius: 10px;
-            max-width: 60%;
+            max-width: 30%;
             color: #fff;
             word-break: break-word;
             white-space: normal;
@@ -392,11 +395,11 @@
                         <p><?php echo $row['status'] ?></p>
                     </div>
                 </div>
-                <a href="../php/logout.php?logout_id=<?php echo $row['unique_id'] ?>" class="logout">Logout</a>
+                <a href="../public/setting.php" class="logout">setting</a>
             </header>
             <div class="nav-icons">
                 <i class="fas fa-comments" title="Current Chats"></i>
-                <i class="fas fa-address-book" title="Contacts" onclick="window.location.href='chat-requests.php'"></i>
+                <i class="fas fa-address-book" title="Contacts" onclick="window.location.href='setting.php'"></i>
                 <i class="fas fa-users" title="Create Group" onclick="window.location.href='create-group.php'"></i>
             </div>
             <div class="users">
@@ -409,25 +412,31 @@
                 </div>
             </div>
             <div class="group-list">
-                <?php
-                include_once "../php/config.php";
-                $unique_id = $_SESSION['unique_id'];
-                $group_query = mysqli_query($conn, 
-                    "SELECT g.group_id, g.group_name 
-                     FROM groups g 
-                     JOIN group_members gm ON g.group_id = gm.group_id 
-                     WHERE gm.unique_id = '{$unique_id}'");
-                if (mysqli_num_rows($group_query) > 0) {
-                    while ($group = mysqli_fetch_assoc($group_query)) {
-                        echo '<div class="group-item" data-group-id="' . $group['group_id'] . '">';
-                        echo '<a href="#" onclick="loadGroupChat(' . $group['group_id'] . '); return false;">' . htmlspecialchars($group['group_name']) . '</a>';
-                        echo '</div>';
-                    }
-                } else {
-                    echo '<div class="group-item">No groups yet.</div>';
-                }
-                ?>
-            </div>
+    <?php
+    include_once "../php/config.php";
+    $unique_id = $_SESSION['unique_id'];
+    $group_query = mysqli_query($conn, 
+        "SELECT g.group_id, g.group_name, g.group_image 
+         FROM groups g 
+         JOIN group_members gm ON g.group_id = gm.group_id 
+         WHERE gm.unique_id = '{$unique_id}'");
+    if (mysqli_num_rows($group_query) > 0) {
+        while ($group = mysqli_fetch_assoc($group_query)) {
+            $group_image = $group['group_image'] ? $group['group_image'] : '../php/images/default-group.png'; // Default image if none
+            $member_count = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM group_members WHERE group_id = {$group['group_id']}"));
+            echo '<div class="group-item" data-group-id="' . $group['group_id'] . '">';
+            echo '<a href="#" onclick="loadGroupChat(' . $group['group_id'] . '); return false;" class="group-link">';
+            echo '<img src="' . htmlspecialchars($group_image) . '" alt="' . htmlspecialchars($group['group_name']) . '" style="width: 35px; height: 35px; border-radius: 50%; margin-right: 10px;">';
+            echo '<span>' . htmlspecialchars($group['group_name']) . '</span>';
+            echo '<span class="status-dot" style="margin-left: auto; color: #26a69a;">' . $member_count . ' members</span>';
+            echo '</a>';
+            echo '</div>';
+        }
+    } else {
+        echo '<div class="group-item">No groups yet.</div>';
+    }
+    ?>
+</div>
         </section>
         <section class="chat-area" id="chat-area">
             <div class="chat-placeholder">Select a chat to start messaging</div>
